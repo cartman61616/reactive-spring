@@ -1,15 +1,12 @@
 package com.mumbles.bootstrap;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class BaseCustomerService implements CustomerService{
@@ -23,9 +20,9 @@ public class BaseCustomerService implements CustomerService{
   }
   @Override
   public Collection<Customer> save(String... names) {
-    List<Customer> customerList = new ArrayList<>();
+    var customerList = new ArrayList<Customer>();
     for (String name : names) {
-      KeyHolder keyHolder = new GeneratedKeyHolder();
+      var keyHolder = new GeneratedKeyHolder();
       this.jdbcTemplate.update(connection -> {
         PreparedStatement ps = connection.prepareStatement(
             "insert into CUSTOMERS (name) values ?",
@@ -33,8 +30,8 @@ public class BaseCustomerService implements CustomerService{
         ps.setString(1, name);
         return ps;
       }, keyHolder);
-      long keyHolderKey = Objects.requireNonNull(keyHolder.getKey()).longValue();
-      Customer customer = this.findById(keyHolderKey);
+      var keyHolderKey = Objects.requireNonNull(keyHolder.getKey()).longValue();
+      var customer = this.findById(keyHolderKey);
       Assert.notNull(name, "the name given must not be null");
       customerList.add(customer);
     }
@@ -43,7 +40,7 @@ public class BaseCustomerService implements CustomerService{
 
   @Override
   public Customer findById(Long id) {
-    String sql = "select * from CUSTOMERS where id = ?";
+    var sql = "select * from CUSTOMERS where id = ?";
     return this.jdbcTemplate.queryForObject(sql, this.rowMapper, id);
   }
 
